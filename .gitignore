@@ -1,0 +1,14 @@
+# Environment variables (contains secret tokens — NEVER commit)
+.env
+
+# Python virtual environment
+.venv/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# OS files
+.DS_Store

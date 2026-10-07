@@ -1,2 +1,3 @@
-python-telegram-bot
-Pillow
+python-telegram-bot[job-queue]>=21.0
+Pillow>=10.0
+python-dotenv>=1.0
