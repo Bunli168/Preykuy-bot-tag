@@ -4,14 +4,33 @@ from PIL import Image, ImageOps
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes
 
-# ដាក់ API Token របស់អ្នកនៅទីនេះ
-TOKEN = "8878112538:AAGWqcWMnJPiT8CxMr5wPbQp2vvuTIjprUI"
+import os
+
+# ដាក់ API Token របស់អ្នកនៅទីនេះ ឬក្នុង Environment Variables របស់ Render (សុវត្ថិភាពជាង)
+TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "8878112538:AAGWqcWMnJPiT8CxMr5wPbQp2vvuTIjprUI")
 
 # កំណត់ Logging ដើម្បីមើល Error
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )
+
+import threading
+import os
+from http.server import BaseHTTPRequestHandler, HTTPServer
+
+class DummyHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.send_header('Content-type', 'text/plain')
+        self.end_headers()
+        self.wfile.write(b"Bot is running")
+
+def run_dummy_server():
+    port = int(os.environ.get("PORT", 8080))
+    server_address = ('0.0.0.0', port)
+    httpd = HTTPServer(server_address, DummyHandler)
+    httpd.serve_forever()
 
 # Function នៅពេលអ្នកប្រើប្រាស់ចុច /start
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -51,6 +70,9 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await status_msg.delete()
 
 def main():
+    # ចាប់ផ្ដើម Dummy Server ដើម្បីកុំឱ្យ Render បិទ
+    threading.Thread(target=run_dummy_server, daemon=True).start()
+
     app = ApplicationBuilder().token(TOKEN).build()
 
     app.add_handler(CommandHandler("start", start))
